@@ -42,7 +42,7 @@ class ShortPathMng(Node):
     tflistener = ""
     MAX_VALUE = 1000000
 
-    def __init__(self, resolution=8, shortPathMethod='GREEDY_BEST_FIRST_SEARCH', isLocalPlanner=False, inflate_radius=0.3):
+    def __init__(self, resolution=2, shortPathMethod='GREEDY_BEST_FIRST_SEARCH', isLocalPlanner=False, inflate_radius=0.3):
         super().__init__('short_path_mng_node') # Call the constructor of the parent with the node name
         # init params
         self.shortPathMethodeSelected = shortPathMethod
@@ -151,19 +151,34 @@ class ShortPathMng(Node):
         ### self.inflate_radius : radius of obstacle inflate (0.3 m)
         ### self.MAP_OBSTACLE_VALUE : value into the map of an obstacle (-100)
         #
-        #
-        #
-        #
-        #                       TODO
-        #
-        #
-        #
-        #
-        ###
 
-        return map
+        new_inflated_map = [[0 for x in range(self.map_height)] for x in range(self.map_width)]
+        d = int(self.inflate_radius / map_resolution)
+        print(f"INFLATE DELTA = {self.inflate_radius}/{map_resolution} = {self.inflate_radius / map_resolution} = {d}")
+        # d = 0
+
+        # Scan every cell in our map
+        for i in range(self.map_width):
+            for j in range(self.map_height):
+                item = map[i][j]
+
+                # Ignore any cell that is not an obstacle
+                if(item != self.MAP_OBSTACLE_VALUE):
+                    continue
+                
+                # mark every cell in a radius of D as obstacle too
+                for k in range(i-d, i+d):
+                    for l in range(j-d, j+d):
+
+                        if(k < 0 or k >= self.map_width or l < 0 or l >= self.map_height):
+                            continue
+                        new_inflated_map[k][l] = self.MAP_OBSTACLE_VALUE
+
+        # return map
         ## UNCOMMENT LINE BELLOW TO TEST YOUR INFLATED MAP
-        #return new_inflated_map
+        return new_inflated_map
+    
+    
     def resizeWithResolution(self, map, resolution):
         marker_container = Marker()
         marker_container.id = 2
